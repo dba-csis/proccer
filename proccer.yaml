@@ -1,0 +1,23 @@
+commands:
+    t:
+        command: "true"
+        warn-after: 15 seconds
+    f:
+        command: "false"
+    sleep:
+        command: "sleep 10"
+        lockfile:
+            timeout: 1
+            silent: false
+    echo:
+        command: "echo ${test}"
+        env:
+            test: "Hello, World!"
+    env:
+        command: "env"
+        env:
+            test: "Hello, World!"
+
+    too-slow:
+        command: "sleep 3"
+        timeout: 1

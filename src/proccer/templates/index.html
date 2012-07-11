@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      id='index-page'>
+<xi:include href='page.html'/>
+<head>
+  <meta http-equiv="refresh" content="42"/>
+</head>
+<body>
+  <?python
+      from itertools import groupby
+  ?>
+  <form><input class='box' type='search' name='q'
+               placeholder='enter filter here'
+               autofocus='yes'
+               value='${request.args.get("q")}'/></form>
+  <div class='box'
+       py:for='project, jobs in groupby(jobs, lambda j: j.login)'
+       py:with='jobs = list(jobs)'>
+    <h1 class='${" ".join(set(job.state for job in jobs))}'>${project}</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>seen</th>
+          <th>login</th>
+          <th>host</th>
+          <th>job</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr py:for='i, job in enumerate(jobs)'
+            class='${["even", "odd"][i % 2]} ${job.state}'>
+          <td><a href='/job/${job.id}/'>
+            ${job.last_seen.strftime('%Y-%m-%d %H:%M:%S')}
+          </a></td>
+          <td><a href='/job/${job.id}/'>
+            ${job.login}
+          </a></td>
+          <td><a href='/job/${job.id}/'>
+            ${job.host}
+          </a></td>
+          <td><a href='/job/${job.id}/'>
+            ${job.name}
+          </a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

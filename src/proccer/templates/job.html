@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+<?python from datetime import datetime?>
+<xi:include href='page.html'/>
+<head>
+  <meta http-equiv="refresh" content="42"/>
+</head>
+<body class='job-section'>
+  <div class='box'>
+    <h1 class='${job.state}'>Job: ${job}</h1>
+    <table>
+      <tr>
+        <th>Status:</th>
+        <td>${job.state}</td>
+      </tr>
+      <tr>
+        <th>Last seen:</th>
+        <td>
+          ${job.last_seen.strftime('%Y-%m-%d %H:%M:%S')}
+          (${datetime.utcnow() - job.last_seen} since)
+        </td>
+      </tr>
+      <tr py:if='job.deleted'>
+        <th>Deleted:</th>
+        <td>
+          ${job.deleted.strftime('%Y-%m-%d %H:%M:%S')}
+          (${datetime.utcnow() - job.deleted} since)
+        </td>
+      </tr>
+    </table>
+    <form method='POST' action='delete' py:if='not job.deleted'>
+      <input type='submit' value='Delete It!'/>
+    </form>
+  </div>
+
+  <div class='box'>
+    <h1>Latest Results</h1>
+    <py:if test='results'>
+      ${render_job_results(results)}
+    </py:if>
+    <py:if test='not results'>
+      <h2>No Results!</h2>
+    </py:if>
+  </div>
+</body>
+</html>

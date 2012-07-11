@@ -1,0 +1,2 @@
+#!/bin/sh
+exec ./test --with-cov --cover-inclusive --cover-package proccer "$@"

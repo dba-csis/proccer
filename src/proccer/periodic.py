@@ -1,0 +1,89 @@
+'Module for various periodic checks.'
+
+from __future__ import with_statement
+
+from datetime import datetime, timedelta
+
+from proccer.database import session_manager
+from proccer.database import Job, JobResult, job_state_id
+from proccer.mail import state_change_notification, repeat_notification
+from proccer.nsca import send_nsca, OK, WARN, CRIT
+
+
+STILL_BAD_INTERVAL = timedelta(seconds=6 * 60 * 60)
+OLD_RESULT_INTERVAL = timedelta(days=7)
+
+def send_lateness_notifications(session):
+    'Send warnings about any jobs that are late.'
+
+    now = datetime.utcnow()
+    late = (session
+                .query(Job)
+                .filter(Job.deleted == None)
+                .filter(Job.last_stamp + Job.warn_after < now)
+                .filter(Job.state_id == job_state_id['ok']))
+
+    for job in late:
+        job.last_stamp = now
+        job.state = 'late'
+        state_change_notification(job, None)
+
+
+def send_still_bad_notifications(session):
+    'Send warnings about any jobs that have been not-ok for > 6 hours.'
+
+    now = datetime.utcnow()
+    still_bad = (session
+                    .query(Job)
+                    .filter(Job.deleted == None)
+                    .filter(Job.last_stamp + STILL_BAD_INTERVAL < now)
+                    .filter(Job.state_id != job_state_id['ok'])
+                    .filter(Job.warn_after != None))
+
+    for job in still_bad:
+        job.last_stamp = now
+        repeat_notification(job)
+
+
+def delete_old_results(session):
+    'Delete proccer results older than one week.'
+
+    now = datetime.utcnow()
+    old_results = (session
+                    .query(JobResult)
+                    .filter(JobResult.stamp < now - OLD_RESULT_INTERVAL))
+    old_results.delete()
+
+
+def send_nsca_status(session):
+    'Send status message to Nagios.'
+
+    late = (session
+                .query(Job)
+                .filter(Job.deleted == None)
+                .filter(Job.state_id == job_state_id['late'])
+                .count())
+    error = (session
+                .query(Job)
+                .filter(Job.deleted == None)
+                .filter(Job.state_id == job_state_id['error'])
+                .count())
+
+    if error:
+        status, message = CRIT, 'There are failed jobs.'
+    elif late:
+        status, message = WARN, 'There are late jobs.'
+    else:
+        status, message = OK, 'All jobs green.'
+
+    send_nsca(status, message)
+
+def main():
+    with session_manager() as session:
+        send_lateness_notifications(session)
+        send_still_bad_notifications(session)
+        delete_old_results(session)
+        send_nsca_status(session)
+
+if __name__ == '__main__':
+    main()

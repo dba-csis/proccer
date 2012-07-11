@@ -1,0 +1,4 @@
+
+        [console_scripts]
+        proccer = proccer.console_scripts:run_processes
+    

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+find . -name \*.pyc | xargs rm -f
+
+export SMTP_HOST='no-such-host'
+export PROCCER_API_URL='http://proccer-test/api/'
+
+exec nosetests "$@"

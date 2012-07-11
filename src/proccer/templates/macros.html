@@ -1,0 +1,30 @@
+<html xmlns:py="http://genshi.edgewall.org/"
+      py:strip="">
+  <py:def function='render_job_results(results)'>
+    <table>
+      <thead>
+        <tr>
+          <th>stamp</th>
+          <th>login</th>
+          <th>host</th>
+          <th>job</th>
+          <th>duration</th>
+        </tr>
+      </thead>
+      <tbody>
+        <py:for each='i, result in enumerate(results)'>
+          <tr class='${["even", "odd"][i % 2]} ${result.state}'>
+            <td>${result.stamp.strftime('%Y-%m-%d %H:%M:%S')}</td>
+            <td>${result.job.login}</td>
+            <td>${result.job.host}</td>
+            <td>${result.job.name}</td>
+            <td class='number'>${result.clock_ms // 1000} s</td>
+          </tr>
+          <tr py:if='result.output'>
+            <td colspan='4'><pre>${result.output}</pre></td>
+          </tr>
+        </py:for>
+      </tbody>
+    </table>
+  </py:def>
+</html>

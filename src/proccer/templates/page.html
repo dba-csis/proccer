@@ -1,0 +1,22 @@
+<html xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      py:strip="">
+<xi:include href='macros.html'/>
+<py:match path="head" once="true">
+  <head>
+    <title>Proccer</title>
+    <link rel='stylesheet' type='text/css' href='/static/normalize.css'/>
+    <link rel='stylesheet' type='text/css' href='/static/style.css'/>
+    ${select('*[local-name()!="title"]')}
+  </head>
+</py:match>
+<py:match path="body" once="true">
+  <body id='container' py:attrs="select('@*')">
+    <div class='box flashed-message ${category}'
+         py:for='category, message in get_flashed_messages(with_categories=True)'>
+      ${message}
+    </div>
+    ${select("*")}
+  </body>
+</py:match>
+</html>

@@ -1,0 +1,74 @@
+/* Apply the sane box-model -- no matter what anyone else says. */
+* {
+    -moz-box-sizing: border-box !important;
+    -webkit-box-sizing: border-box !important;
+    box-sizing: border-box !important;
+}
+
+/* Pretty, pretty tables */
+#container {
+    min-width: 42em;
+    margin: 0 auto;
+    width: 65%;
+}
+table {
+    width: 100%;
+    border-spacing: 0;
+}
+td, th {
+    text-align: left;
+    margin: 0;
+    padding: 5px;
+}
+pre {
+    overflow: hidden;
+    white-space: pre-wrap;
+}
+
+td a {
+    display: block;
+    text-decoration: inherit;
+    color: inherit;
+}
+
+td.number {
+    text-align: right;
+}
+
+/* Flashed messages */
+.flashed-message {
+    font-size: 150%;
+    text-align: center;
+    background-color: #fff959;
+}
+
+/* A box for things that belong together */
+.box {
+    margin: 1em auto;
+    padding: 1em;
+    border: thin solid gray;
+    border-radius: 10px;
+}
+.box h1 {
+    padding: .3em;
+    margin: -.5em -.5em .5em -.5em;
+    padding-left: 1em;
+    border-radius: 10px 10px 0 0;
+}
+
+/* Background colors indicating good/bad'ness of results -- ordered from best
+ * to worst, so groups of jobs can set their <h1>'s class to a list unique
+ * states for all their jobs. */
+.ok { background-color: #e6ffcc; }
+.ok.odd  { background-color: #f2ffe5; }
+.late  { background-color: #eeeeee; }
+.late.odd   { background-color: #eaeaea; }
+.error  { background-color: #ffcccc; }
+.error.odd   { background-color: #ffe5e5; }
+
+/* The filter input field */
+#index-page input {
+    font-size: 133%;
+    width: 100%;
+    outline: none;
+}
