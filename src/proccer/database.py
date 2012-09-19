@@ -204,6 +204,9 @@ def update_proccer_job(session, result):
     job.warn_after = parse_interval(config.get('warn-after'))
     job.notify = config.get('notify')
 
+    log.debug('old/new state for job %d: %s/%s',
+              job.id, old_state, new_state)
+
     if old_state != new_state:
         update_job_history(job)
         job_state_changed(job, result)

@@ -5,9 +5,12 @@ from contextlib import closing
 from email.mime.text import MIMEText
 from email.utils import make_msgid
 from genshi.template import NewTextTemplate as TextTemplate
+import logging
 import os
 import smtplib
 from socket import gethostname
+
+log = logging.getLogger(__name__)
 
 # 64K should be enough for anyone.
 MAX_OUTPUT_SIZE = 64 * 1024
@@ -32,6 +35,7 @@ def repeat_notification(job):
 
 def mail_for_state(job, state, result):
     if not (job.notify or default_recipient):
+        log.debug('nobody to notify for job %d state-change', job.id)
         return None, None
     rcpt = job.notify or [default_recipient]
 
