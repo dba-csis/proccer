@@ -4,11 +4,11 @@ from setuptools import setup, find_packages
 
 setup(
     name='proccer',
-    version='0.7.8',
+    version='0.7.9',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
-    zip_safe=True,
+    zip_safe=False,
     install_requires='''
         PyYAML==3.09
         SQLAlchemy==0.7.6
