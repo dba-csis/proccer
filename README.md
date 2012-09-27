@@ -26,3 +26,7 @@ included configuration:
     proccer t
 
 This should leave a log-file `proccer.log` with details of the job run.
+
+To install the dependencies for the manager (i.e. admin UI and HTTP API):
+
+    pip install -r manager-requirements.txt

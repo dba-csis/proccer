@@ -1,0 +1,7 @@
+SQLAlchemy==0.7.6
+Werkzeug==0.8.1
+Flask==0.8
+Flask-Genshi==0.5.1
+blinker==1.2
+wsgi-lite==0.5a2
+wsgiref==0.1.2
