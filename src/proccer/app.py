@@ -72,6 +72,7 @@ def report():
     try:
         result = json.loads(request.data, use_decimal=False)
     except Exception, e:
+        log.info('Bad report', exc_info=True)
         raise BadRequest()
 
     report_received.send(result)
