@@ -194,7 +194,7 @@ def update_proccer_job(session, result):
                             login=result['login'],
                             name=result['name'])
     if job.deleted:
-        log.info('Reviving zombie-job %d', job.id)
+        log.info('Reviving zombie-job %r', job.id)
         job.deleted = None
     job.last_seen = stamp
     job.last_stamp = datetime.utcnow()
@@ -204,7 +204,7 @@ def update_proccer_job(session, result):
     job.warn_after = parse_interval(config.get('warn-after'))
     job.notify = config.get('notify')
 
-    log.debug('old/new state for job %d: %s/%s',
+    log.debug('old/new state for job %r: %s/%s',
               job.id, old_state, new_state)
 
     if old_state != new_state:

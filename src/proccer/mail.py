@@ -35,7 +35,7 @@ def repeat_notification(job):
 
 def mail_for_state(job, state, result):
     if not (job.notify or default_recipient):
-        log.debug('nobody to notify for job %d state-change', job.id)
+        log.debug('nobody to notify for job %r state-change', job.id)
         return None, None
     rcpt = job.notify or [default_recipient]
 
