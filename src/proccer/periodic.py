@@ -3,6 +3,7 @@
 from __future__ import with_statement
 
 from datetime import datetime, timedelta
+import logging
 
 from proccer.database import session_manager
 from proccer.database import Job, JobResult, job_state_id
@@ -86,4 +87,5 @@ def main():
         send_nsca_status(session)
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG, disable_existing_loggers=0)
     main()
