@@ -66,6 +66,9 @@ def mail_for_state(job, state, result):
         msg['Reply-To'] = mail_reply_to
     msg['To'] = ', '.join(rcpt)
 
+    log.info('sending %s notification for job %r to %r message-id %s',
+             state, job.id, rcpt, msg['Message-ID'])
+
     return msg, rcpt
 
 
