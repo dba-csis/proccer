@@ -4,6 +4,8 @@ from __future__ import with_statement
 
 from datetime import datetime, timedelta
 import logging
+import logging.config
+import os
 
 from proccer.database import session_manager
 from proccer.database import Job, JobResult, job_state_id
@@ -11,8 +13,11 @@ from proccer.mail import state_change_notification, repeat_notification
 from proccer.nsca import send_nsca, OK, WARN, CRIT
 
 
+log = logging.getLogger('proccer')
+
 STILL_BAD_INTERVAL = timedelta(seconds=6 * 60 * 60)
 OLD_RESULT_INTERVAL = timedelta(days=7)
+
 
 def send_lateness_notifications(session):
     'Send warnings about any jobs that are late.'
@@ -80,6 +85,7 @@ def send_nsca_status(session):
     send_nsca(status, message)
 
 def main():
+    log.debug('doing periodic tasks')
     with session_manager() as session:
         send_lateness_notifications(session)
         send_still_bad_notifications(session)
@@ -87,5 +93,9 @@ def main():
         send_nsca_status(session)
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG, disable_existing_loggers=0)
+    log_conf = os.environ.get('LOGGING_CONFIGURATION')
+    if log_conf:
+        logging.config.fileConfig(log_conf, disable_existing_loggers=0)
+    else:
+        logging.basicConfig(level=logging.DEBUG, disable_existing_loggers=0)
     main()
