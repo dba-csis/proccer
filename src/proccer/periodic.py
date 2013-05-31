@@ -30,6 +30,7 @@ def send_lateness_notifications(session):
                 .filter(Job.state_id == job_state_id['ok']))
 
     for job in late:
+        log.debug('still late: %r', job)
         job.last_stamp = now
         job.state = 'late'
         state_change_notification(job, None)
@@ -47,6 +48,7 @@ def send_still_bad_notifications(session):
                     .filter(Job.warn_after != None))
 
     for job in still_bad:
+        log.debug('still not-good: %r', job)
         job.last_stamp = now
         repeat_notification(job)
 
