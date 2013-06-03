@@ -140,7 +140,7 @@ class JobResult(Base):
     def create(cls, job, clock_ms, result, rusage, output):
         r = JobResult(job=job, state=job.state, clock_ms=clock_ms,
                       result=result, rusage=rusage, output=output,
-                      stamp=job.last_stamp)
+                      stamp=job.last_seen)
         Session.object_session(job).add(r)
         return r
 
@@ -162,7 +162,7 @@ class JobHistory(Base):
 
     @classmethod
     def create(cls, job):
-        history = JobHistory(job=job, started=job.last_stamp, state=job.state)
+        history = JobHistory(job=job, started=job.last_seen, state=job.state)
         Session.object_session(job).add(history)
         return history
 
@@ -217,7 +217,7 @@ def update_proccer_job(session, result):
 def update_job_history(job):
     if job.history.count():
         previous = job.history.filter(JobHistory.ended == None).one()
-        previous.ended = job.last_stamp
+        previous.ended = job.last_seen
     JobHistory.create(job)
 
 
