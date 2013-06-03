@@ -197,7 +197,6 @@ def update_proccer_job(session, result):
         log.info('Reviving zombie-job %r', job.id)
         job.deleted = None
     job.last_seen = stamp
-    job.last_stamp = datetime.utcnow()
     old_state, job.state = job.state, new_state
 
     config = result.get('config', {})
@@ -208,6 +207,7 @@ def update_proccer_job(session, result):
               job.id, old_state, new_state)
 
     if old_state != new_state:
+        job.last_stamp = datetime.utcnow()
         update_job_history(job)
         job_state_changed(job, result)
 
