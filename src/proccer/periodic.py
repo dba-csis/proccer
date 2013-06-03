@@ -26,11 +26,11 @@ def send_lateness_notifications(session):
     late = (session
                 .query(Job)
                 .filter(Job.deleted == None)
-                .filter(Job.last_stamp + Job.warn_after < now)
+                .filter(Job.last_seen + Job.warn_after < now)
                 .filter(Job.state_id == job_state_id['ok']))
 
     for job in late:
-        log.debug('still late: %r', job)
+        log.debug('late: %r', job)
         job.last_stamp = now
         job.state = 'late'
         state_change_notification(job, None)
