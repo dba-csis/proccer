@@ -28,7 +28,12 @@ def state_change_notification(job, result):
 
 
 def repeat_notification(job):
-    msg, rcpt = mail_for_state(job, 'still ' + job.state, None)
+    job_result = job.results.first()
+    result = {
+        'output': job_result.output,
+        'config': {},
+    }
+    msg, rcpt = mail_for_state(job, 'still ' + job.state, result)
     if msg:
         send_mail(msg, rcpt)
 
