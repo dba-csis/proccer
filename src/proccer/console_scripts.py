@@ -7,12 +7,15 @@ from lockfile import FileLock, LockError
 from StringIO import StringIO
 import sys
 
+default_log_file = os.path.expanduser(os.environ.get('PROCCER_LOG',
+                                                     '~/proccer.log'))
+
 run_processes_opts = OptionParser('Usage: %prog [options] proccess(es)')
 run_processes_opts.add_option('-c', '--configuration',
                               default='proccer.yaml')
 run_processes_opts.add_option('-v', '--verbose',
                               action='count', dest='verbosity', default=0)
-run_processes_opts.add_option('--log-file', default='proccer.log')
+run_processes_opts.add_option('--log-file', default=default_log_file)
 
 
 log_file_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
