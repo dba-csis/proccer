@@ -2,6 +2,7 @@ from __future__ import with_statement
 
 from contextlib import closing, contextmanager
 from datetime import datetime
+import errno
 import jsonlib as json
 from lockfile import FileLock, LockError
 import logging
@@ -73,13 +74,11 @@ def run_process(conf, name):
 def _in_parent(name, desc, pid, logfile):
     # Install signal handlers
     def _signalled(signo, frames):
-        if signo != signal.SIGCHLD:
-            log.debug('received signal %s',
-                      signal_name.get(signo, str(signo)))
-            os.killpg(pid, signal.SIGTERM)
+        log.debug('received signal %s, passing it on to child',
+                  signal_name.get(signo, str(signo)))
+        os.killpg(pid, signal.SIGTERM)
 
     signal.signal(signal.SIGALRM, _signalled)
-    signal.signal(signal.SIGCHLD, _signalled)
     signal.signal(signal.SIGINT, _signalled)
     signal.signal(signal.SIGTERM, _signalled)
 
@@ -89,11 +88,7 @@ def _in_parent(name, desc, pid, logfile):
         signal.alarm(timeout)
 
     before = time.time()
-    signal.pause()
-    # After we've received SIGALRM we don't want wait4 to be interrupted by
-    # SIGCHLD, so clear the SIGCHLD handler.
-    signal.signal(signal.SIGCHLD, signal.SIG_DFL)
-    _, status, rusage = os.wait4(pid, 0)
+    _, status, rusage = _wait_for(pid)
     after = time.time()
 
     # Clear timeout
@@ -115,6 +110,16 @@ def _in_parent(name, desc, pid, logfile):
         'clock': after - before,
         'output': output,
     }
+
+
+def _wait_for(pid):
+    # Keep retrying os.wait4 until it does not get interrupted.
+    while True:
+        try:
+            return os.wait4(pid, 0)
+        except OSError as e:
+            if e.errno != errno.EINTR:
+                raise
 
 
 def _in_child(name, desc, logfile):
