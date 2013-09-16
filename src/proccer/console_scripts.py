@@ -15,6 +15,8 @@ run_processes_opts.add_option('-c', '--configuration',
                               default='proccer.yaml')
 run_processes_opts.add_option('-v', '--verbose',
                               action='count', dest='verbosity', default=0)
+run_processes_opts.add_option('--logging-configuration',
+                              default=os.environ.get('PROCCER_LOG_CONFIG'))
 run_processes_opts.add_option('--log-file', default=default_log_file)
 
 
@@ -69,7 +71,11 @@ def rotate_log_file(path):
 def configure_logging(opts):
     level = logging.FATAL - 10 * opts.verbosity
 
-    if opts.log_file:
+    if opts.logging_configuration:
+        conf_path = os.path.expanduser(opts.logging_configuration)
+        logging.config.fileConfig(conf_path)
+
+    elif opts.log_file:
         assert "'" not in opts.log_file
         logging.config.fileConfig(StringIO(log_config % {
             'path': opts.log_file,
