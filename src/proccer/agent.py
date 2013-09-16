@@ -187,7 +187,8 @@ def _grab_lock(name, desc):
 
 
 def log_for(result):
-    log.debug('[%s] result: %r', result['name'], result)
+    log.debug('[%s] result: %r', result['name'], result,
+              extra={'result': result})
     log.info('[%s] took %.2fs', result['name'], result['clock'])
 
 
