@@ -9,12 +9,16 @@ import logging
 import os
 import re
 import requests
+import resource
 import signal
 from socket import gethostname
 from tempfile import NamedTemporaryFile
 import time
 import traceback
 import yaml
+
+
+default_memory_limit = 1 * 1024 * 1024 * 1024  # 1GB memory limit
 
 log = logging.getLogger('proccer')
 
@@ -122,6 +126,11 @@ def _wait_for(pid):
                 raise
 
 
+def set_memory_limit(desc):
+    memory_limit = desc.get('memory-limit', default_memory_limit)
+    resource.setrlimit(resource.RLIMIT_AS, (memory_limit, -1))
+
+
 def _in_child(name, desc, logfile):
     try:
         # We want our own process-group.
@@ -138,6 +147,9 @@ def _in_child(name, desc, logfile):
         os.dup2(1, 2)
 
         _close_all_fds(min=3)
+
+        # limit resources used by the child-process
+        set_memory_limit(desc)
 
         # Go!
         os.environ.update(desc.get('env', {}))
