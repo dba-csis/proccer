@@ -21,3 +21,7 @@ commands:
     too-slow:
         command: "sleep 3"
         timeout: 1
+
+    m:
+        command: "true"
+        memory-limit: 500000 #bytes
