@@ -24,4 +24,8 @@ commands:
 
     m:
         command: "true"
-        memory-limit: 500000 #bytes
+        memory-limit: 500000  # memory limit can be specified with and integer (bytes)
+
+    n:
+        command: "true"
+        memory-limit: "5M" # memory limit can also be specified by strings like "5M", "5 G" or "3.5GB"
