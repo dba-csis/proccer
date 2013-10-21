@@ -6,6 +6,7 @@ import errno
 import jsonlib as json
 from lockfile import FileLock, LockError
 import logging
+from math import pow
 import os
 import re
 import requests
@@ -126,9 +127,62 @@ def _wait_for(pid):
                 raise
 
 
+def memory_size_human_to_bytes(s):
+    '''
+    This function converts human readble memory size to bytes.
+    The converted value is returned.
+
+    >>> memory_size_human_to_bytes('2M')
+    2097152
+    >>> memory_size_human_to_bytes('2m')
+    2097152
+    >>> memory_size_human_to_bytes('2MB')
+    2097152
+    >>> memory_size_human_to_bytes('2 M')
+    2097152
+    >>> memory_size_human_to_bytes('1.5 G')
+    1610612736
+    >>> memory_size_human_to_bytes('100')
+    100
+    '''
+
+    memory_units = {
+        '': 1,
+        'B': 1,
+        'K': pow(1024, 1),
+        'KB': pow(1024, 1),
+        'M': pow(1024, 2),
+        'MB': pow(1024, 2),
+        'G': pow(1024, 3),
+        'GB': pow(1024, 3),
+        'T': pow(1024, 4),
+        'TB': pow(1024, 4),
+        'P': pow(1024, 5),
+        'PB': pow(1024, 5),
+        'E': pow(1024, 6),
+        'EB': pow(1024, 6),
+        'Z': pow(1024, 7),
+        'ZB': pow(1024, 7),
+        'Y': pow(1024, 8),
+        'YB': pow(1024, 8)
+    }
+
+    m = re.compile('^([0-9\.]+) *([a-zA-Z]*)$').match(s)
+    value = float(m.group(1))
+    unit = m.group(2).upper()
+
+    return int(value * memory_units[unit])
+
+
 def set_memory_limit(desc):
-    memory_limit = desc.get('memory-limit', default_memory_limit)
-    resource.setrlimit(resource.RLIMIT_AS, (memory_limit, -1))
+    memory_limit_human = desc.get('memory-limit', default_memory_limit)
+
+    if isinstance(memory_limit_human, int):
+        memory_limit_bytes = memory_limit_human
+    else:
+        memory_limit_bytes = memory_size_human_to_bytes(memory_limit_human)
+
+    resource.setrlimit(resource.RLIMIT_AS, (memory_limit_bytes, -1))
 
 
 def _in_child(name, desc, logfile):
