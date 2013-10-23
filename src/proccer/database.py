@@ -67,6 +67,8 @@ class Job(Base):
     login = Column(String, nullable=False)
     name = Column(String, nullable=False)
 
+    # last_seen is the timestamp from the remote host, last_stamp is the
+    # timestamp from the local host.
     last_seen = Column(DateTime, nullable=False)
     last_stamp = Column(DateTime, nullable=False)
     state_id = Column('state', Integer, ForeignKey('proccer_state.id'),
