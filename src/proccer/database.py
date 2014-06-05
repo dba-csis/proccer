@@ -19,7 +19,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker, relationship
 from sqlalchemy.orm.exc import NoResultFound
 
 from proccer.db_types import JSON
-from proccer.mail import state_change_notification
+from proccer.notifications import state_change_notification
 
 log = logging.getLogger(__name__)
 
