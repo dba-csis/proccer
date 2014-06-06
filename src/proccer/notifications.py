@@ -56,16 +56,30 @@ def notify_slack(job, state):
         return
 
     url = '%s/job/%d/' % (web_url, job.id)
+    color = slack_colors.get(state.replace('still ', ''), 'warning')
+    text = '<%s|%s> %s' % (url, unicode(job), state)
     payload = {
         'channel': slack_channel,
         'username': 'proccer',
-        'text': '<%s|%s> %s' % (url, unicode(job), state),
         'icon_emoji': ':penguin:',
+        'attachments': [
+            {
+                'color': color,
+                'text': text,
+                'fallback': text,
+            },
+        ],
     }
     response = requests.post(slack_api_url,
                              params={'token': slack_api_token},
                              data={'payload': json.dumps(payload)})
     response.raise_for_status()
+
+slack_colors = {
+    'ok': 'good',
+    'late': 'warning',
+    'error': 'danger', # Will Robinson!
+}
 
 
 def mail_for_state(job, state, result):
