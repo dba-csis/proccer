@@ -20,6 +20,7 @@ import yaml
 
 
 default_memory_limit = 1 * 1024 * 1024 * 1024  # 1GB memory limit
+max_output = 128 * 1024  # Truncate output at 128KB
 
 log = logging.getLogger('proccer')
 
@@ -102,7 +103,8 @@ def _in_parent(name, desc, pid, logfile):
 
     # Read stdout/stderr log and return result
     logfile.seek(0, 0)
-    output = logfile.read().decode('utf-8', 'replace')
+    output_length = logfile.tell()
+    output = logfile.read(max_output).decode('utf-8', 'replace')
 
     return {
         'stamp': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
@@ -114,6 +116,7 @@ def _in_parent(name, desc, pid, logfile):
         'rusage': dictify_rusage(rusage),
         'clock': after - before,
         'output': output,
+        'output_truncated': len(output) < output_length,
     }
 
 
