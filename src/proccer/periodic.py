@@ -9,7 +9,8 @@ import os
 
 from proccer.database import session_manager
 from proccer.database import Job, JobResult, job_state_id
-from proccer.mail import state_change_notification, repeat_notification
+from proccer.notifications import (state_change_notification,
+                                   repeat_notification)
 from proccer.nsca import send_nsca, OK, WARN, CRIT
 
 

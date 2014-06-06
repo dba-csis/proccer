@@ -5,8 +5,10 @@ from contextlib import closing
 from email.mime.text import MIMEText
 from email.utils import make_msgid
 from genshi.template import NewTextTemplate as TextTemplate
+import json
 import logging
 import os
+import requests
 import smtplib
 from socket import gethostname
 
@@ -20,11 +22,20 @@ mail_from = os.environ.get('PROCCER_MAIL_FROM', 'proccer@localhost')
 mail_reply_to = os.environ.get('PROCCER_REPLY_TO')
 smtp_host = os.environ.get('SMTP_HOST', 'localhost')
 
+web_url = os.environ.get('PROCCER_WEB_URL', '').strip('/')
+
+default_api_url = 'https://slack.com/services/hooks/incoming-webhook'
+slack_api_url = os.environ.get('SLACK_API_URL', default_api_url)
+slack_api_token = os.environ.get('SLACK_API_TOKEN')
+slack_channel = os.environ.get('SLACK_CHANNEL', '#general')
+
 
 def state_change_notification(job, result):
     msg, rcpt = mail_for_state(job, job.state, result)
     if msg:
         send_mail(msg, rcpt)
+
+    notify_slack(job, job.state)
 
 
 def repeat_notification(job):
@@ -37,6 +48,39 @@ def repeat_notification(job):
     if msg:
         send_mail(msg, rcpt)
 
+    notify_slack(job, 'still ' + job.state)
+
+
+def notify_slack(job, state):
+    if not slack_api_token:
+        return
+
+    url = '%s/job/%d/' % (web_url, job.id)
+    color = slack_colors.get(state.replace('still ', ''), 'warning')
+    text = '<%s|%s> %s' % (url, unicode(job), state)
+    payload = {
+        'channel': slack_channel,
+        'username': 'proccer',
+        'icon_emoji': ':penguin:',
+        'attachments': [
+            {
+                'color': color,
+                'text': text,
+                'fallback': text,
+            },
+        ],
+    }
+    response = requests.post(slack_api_url,
+                             params={'token': slack_api_token},
+                             data={'payload': json.dumps(payload)})
+    response.raise_for_status()
+
+slack_colors = {
+    'ok': 'good',
+    'late': 'warning',
+    'error': 'danger', # Will Robinson!
+}
+
 
 def mail_for_state(job, state, result):
     if not (job.notify or default_recipient):
@@ -48,7 +92,7 @@ def mail_for_state(job, state, result):
     subject = '%s %s' % (tag, state)
 
     values = {
-        'url': os.environ.get('PROCCER_WEB_URL', '').strip('/'),
+        'url': web_url,
         'getoutput': getoutput,
         'job': job,
         'state': state,
