@@ -36,6 +36,17 @@ local_config = from_envvar(app.config, 'PROCCER_SETTINGS')
 
 genshi = Genshi(app)
 
+### Raven error-catching middleware
+if 'SENTRY_DSN' in os.environ:  # pragma: no-cover
+    # Don't know why, don't care why, but the raven Flask-plugin is
+    # broken, at least in our environment, so just do it with WSGI
+    # middleware.
+    from raven import Client
+    from raven.middleware import Sentry
+
+    app.config['PROPAGATE_EXCEPTIONS'] = True
+    app.wsgi_app = Sentry(app.wsgi_app, Client(os.environ['SENTRY_DSN']))
+
 @app.route('/')
 def index():
     with session_manager() as session:
