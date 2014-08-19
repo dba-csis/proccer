@@ -4,7 +4,6 @@ from math import pow
 from mock import patch, call
 from nose.tools import eq_
 import os
-import os.path
 import resource
 from tempfile import NamedTemporaryFile
 
@@ -216,14 +215,11 @@ def fork_and_wait(name, desc):
 
 
 def check_memlimit(memory_bytes):
-    alloc_file = os.path.join('test_agent', 'allocate_memory.py')
-    dirname = os.path.dirname(os.path.realpath(__file__))
-    alloc_command = 'python %s' % os.path.join(dirname, alloc_file) + ' %s'
-
     job_name = 'jobname'
+    command = 'python ./src/proccer/t/test_agent/allocate_memory.py %s'
 
     job_desc = {
-        'command': alloc_command % memory_bytes
+        'command': command % memory_bytes
     }
 
     r = fork_and_wait(job_name, job_desc)
