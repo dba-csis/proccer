@@ -5,9 +5,9 @@ from mock import Mock, patch
 from socket import gethostname
 
 from proccer.database import Job
-from proccer.mail import send_mail
-from proccer.mail import mail_for_state
-from proccer.mail import state_change_notification
+from proccer.notifications import send_mail
+from proccer.notifications import mail_for_state
+from proccer.notifications import state_change_notification
 from proccer.t.testing import setup_module
 
 
@@ -36,11 +36,15 @@ ok_result = {
     'output': 'Hello, World!',
 }
 
+devops_mail_patch = patch('proccer.notifications.default_recipient',
+                     'devops@example.com')
+
+
 
 def test_state_change_notification():
-    with patch('proccer.mail.smtplib') as smtplib:
+    with patch('proccer.notifications.smtplib') as smtplib:
         smtp = smtplib.SMTP.return_value = Mock()
-        with patch('proccer.mail.default_recipient', 'devops@example.com'):
+        with devops_mail_patch:
             state_change_notification(job, ok_result)
         assert smtplib.SMTP.call_args == (('no-such-host',), {}),\
                smtplib.SMTP.call_args
@@ -50,7 +54,7 @@ def test_state_change_notification():
 def test_send_mail():
     msg = Mock()
     msg.as_string.return_value = 'Hello, World!'
-    with patch('proccer.mail.default_recipient', 'devops@example.com'):
+    with devops_mail_patch:
         with patch('smtplib.SMTP') as smtp:
             send_mail(msg, ['bar@example.com'])
     assert msg.as_string.called
@@ -62,7 +66,7 @@ def test_send_mail():
 
 
 def test_mail_for_state():
-    with patch('proccer.mail.default_recipient', 'devops@example.com'):
+    with devops_mail_patch:
         msg, rcpt = mail_for_state(job, 'ok', ok_result)
     txt = msg.as_string()
     assert rcpt == ['devops@example.com'], repr(rcpt)

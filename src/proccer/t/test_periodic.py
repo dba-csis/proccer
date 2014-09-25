@@ -26,5 +26,5 @@ def test_periodic():
     session.flush()
 
     # FIXME - This needs real tests!
-    with patch('proccer.mail.smtplib'):
+    with patch('proccer.notifications.smtplib'):
         main()
