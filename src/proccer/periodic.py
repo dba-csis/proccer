@@ -11,8 +11,6 @@ from proccer.database import session_manager
 from proccer.database import Job, JobResult, job_state_id
 from proccer.notifications import (state_change_notification,
                                    repeat_notification)
-from proccer.nsca import send_nsca, OK, WARN, CRIT
-
 
 log = logging.getLogger('proccer')
 
@@ -64,36 +62,12 @@ def delete_old_results(session):
     old_results.delete()
 
 
-def send_nsca_status(session):
-    'Send status message to Nagios.'
-
-    late = (session
-                .query(Job)
-                .filter(Job.deleted == None)
-                .filter(Job.state_id == job_state_id['late'])
-                .count())
-    error = (session
-                .query(Job)
-                .filter(Job.deleted == None)
-                .filter(Job.state_id == job_state_id['error'])
-                .count())
-
-    if error:
-        status, message = CRIT, 'There are failed jobs.'
-    elif late:
-        status, message = WARN, 'There are late jobs.'
-    else:
-        status, message = OK, 'All jobs green.'
-
-    send_nsca(status, message)
-
 def main():
     log.debug('doing periodic tasks')
     with session_manager() as session:
         send_lateness_notifications(session)
         send_still_bad_notifications(session)
         delete_old_results(session)
-        send_nsca_status(session)
 
 if __name__ == '__main__':
     log_conf = os.environ.get('LOGGING_CONFIGURATION')
