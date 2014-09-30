@@ -13,7 +13,7 @@ from proccer.t.test_mail import ok_result
 
 def test_post_new_event():
     client = Client(app, BaseResponse)
-    with patch('proccer.mail.smtplib') as smtplib:
+    with patch('proccer.notifications.smtplib') as smtplib:
         resp = client.post('/api/1.0/report',
                            data=json.dumps(ok_result),
                            headers={'Content-Type': 'application/json'})
