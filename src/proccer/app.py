@@ -55,7 +55,7 @@ def index():
                     .filter(Job.deleted == None)
                     .order_by(Job.login, Job.host, Job.name))
 
-        text = Job.login + ' ' + Job.host + ' ' + Job.name
+        text = Job.login + ' ' + Job.host + ' ' + Job.name + ' ' + Job.state
         for q in request.args.get('q', '').strip().split():
             jobs = jobs.filter(text.contains(q))
 
