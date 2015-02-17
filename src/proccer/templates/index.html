@@ -14,11 +14,14 @@
                placeholder='enter filter here'
                autofocus='yes'
                value='${request.args.get("q")}'/></form>
-  <div class='box'
+  <div class='box role'
        py:for='project, jobs in groupby(jobs, lambda j: j.login)'
        py:with='jobs = list(jobs)'>
-    <h1 class='${" ".join(set(job.state for job in jobs))}'>${project}</h1>
-    <table>
+    <div class='header role-header ${" ".join(set(job.state for job in jobs))}'>
+      <h1>${project}</h1>
+      <span class='toggle-text'></span>
+    </div>
+    <table class="role-details">
       <thead>
         <tr>
           <th>seen</th>
@@ -30,7 +33,7 @@
       </thead>
       <tbody>
         <tr py:for='i, job in enumerate(jobs)'
-            class='${["even", "odd"][i % 2]} ${job.state}'>
+            class='${["even", "odd"][i % 2]} ${job.state} job'>
           <td><a href='/job/${job.id}/'>
             ${job.last_seen.strftime('%Y-%m-%d %H:%M:%S')}
           </a></td>
