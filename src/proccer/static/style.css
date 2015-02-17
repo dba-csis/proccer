@@ -45,26 +45,41 @@ td.number {
 /* A box for things that belong together */
 .box {
     margin: 1em auto;
-    padding: 1em;
+    padding: .5em;
     border: thin solid gray;
     border-radius: 10px;
 }
-.box h1 {
-    padding: .3em;
-    margin: -.5em -.5em .5em -.5em;
+.box .header {
+    margin: -.5em -.5em -.5em -.5em;
     padding-left: 1em;
-    border-radius: 10px 10px 0 0;
+    padding-right: 1em;
+    border-radius: 10px 10px 10px 10px;
+}
+.box .header h1 {
+    display: inline-block;
+    margin: .3em;
+}
+.box .header:hover {
+    cursor: pointer;
+}
+.box .header span {
+    display: inline-block;
+    float: right;
+    padding: 1em 1em 1em 1em;
+}
+.box table {
+    margin-top: 1em;
 }
 
 /* Background colors indicating good/bad'ness of results -- ordered from best
  * to worst, so groups of jobs can set their <h1>'s class to a list unique
  * states for all their jobs. */
-.ok { background-color: #e6ffcc; }
-.ok.odd  { background-color: #f2ffe5; }
+.ok { background-color: #66ff6c; }
+.ok.odd  { background-color: #92ff95; }
 .late  { background-color: #eeeeee; }
 .late.odd   { background-color: #eaeaea; }
-.error  { background-color: #ffcccc; }
-.error.odd   { background-color: #ffe5e5; }
+.error  { background-color: #ff7777; }
+.error.odd   { background-color: #ff9999; }
 
 /* The filter input field */
 #index-page input {
