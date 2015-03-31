@@ -69,7 +69,7 @@ def rotate_log_file(path):
 
 
 def configure_logging(opts):
-    level = logging.FATAL - 10 * opts.verbosity
+    level = logging.ERROR - 10 * opts.verbosity
 
     if opts.logging_configuration:
         conf_path = os.path.expanduser(opts.logging_configuration)
@@ -107,5 +107,5 @@ def run_processes():
             log.debug('[%s] done', name)
 
         except agent.ProcessError, e:
-            log.warn('[%s] %s', name, e.args[0])
+            log.error('[%s] %s', name, e.args[0])
             sys.exit(1)
