@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='proccer',
-    version='0.7.28',
+    version='0.7.29',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
