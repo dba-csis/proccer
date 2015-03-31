@@ -271,11 +271,9 @@ def report(result):
         r = requests.post(report_url,
                           data=json.dumps(result),
                           headers=headers)
-        r.raise_for_status()
     except Exception:
-        log.warn('error delivering job-status %r',
-                 result,
-                 exc_info=True)
+        log.error('error delivering job-status %r',
+                  result, exc_info=True)
 
 
 def raise_for(result):
