@@ -17,6 +17,7 @@ from sqlalchemy import Integer, String, DateTime, Interval
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import scoped_session, sessionmaker, relationship
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.pool import NullPool
 
 from proccer.db_types import JSON
 from proccer.notifications import state_change_notification
@@ -26,7 +27,7 @@ log = logging.getLogger(__name__)
 # Configure engine and create session class.
 database_uri = os.environ.get('DATABASE_URL',
                               'postgresql://proccer@localhost/proccer')
-engine = create_engine(database_uri)
+engine = create_engine(database_uri, poolclass=NullPool)
 Session = scoped_session(sessionmaker(bind=engine))
 
 # Create declarative mappings.
