@@ -72,6 +72,34 @@ def test_with_overrides():
     assert parsed == expected, parsed
 
 
+def test_with_default_timeout():
+    yaml = '''
+        default-timeout: 5 seconds
+        commands:
+            noto:   {command: "true", warn-after: 15 seconds}
+            withto:
+                command: "true"
+                warn-after: 15 seconds
+                timeout: 2 hours
+    '''
+    parsed = read_configuration(yaml)
+    expected = {
+        'commands': {
+            'noto': {
+                'command': 'true',
+                'warn-after': '15 seconds',
+                'timeout': 5
+            },
+            'withto': {
+                'command': 'true',
+                'warn-after': '15 seconds',
+                'timeout': 7200,
+            },
+        }
+    }
+    eq_(expected, parsed)
+
+
 def test_memory_conversion():
     eq_(memory_size_human_to_bytes('1'), 1)
     eq_(memory_size_human_to_bytes('1k'), 1024)
