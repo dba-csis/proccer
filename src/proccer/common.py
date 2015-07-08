@@ -7,6 +7,11 @@ def parse_interval(s):
     if s is None:
         return None
     try:
+        return timedelta(seconds=int(s))
+    except ValueError:
+        pass  # not an intable thing
+
+    try:
         count, interval = s.split()
         return timedelta(seconds=int(count) * intervals[interval])
     except (KeyError, ValueError):
