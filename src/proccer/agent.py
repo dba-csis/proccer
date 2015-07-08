@@ -18,6 +18,8 @@ import time
 import traceback
 import yaml
 
+from proccer.common import parse_interval
+
 
 default_memory_limit = 1 * 1024 * 1024 * 1024  # 1GB memory limit
 max_output = 128 * 1024  # Truncate output at 128KB
@@ -47,6 +49,14 @@ def read_configuration(fp):
                                    name)
             if m.match(job_id):
                 desc.update(override)
+
+    default_timeout = parsed.pop('default-timeout', None)
+
+    for desc in parsed['commands'].values():
+        if not default_timeout and 'timeout' not in desc:
+            continue
+        td = parse_interval(desc.get('timeout', default_timeout))
+        desc['timeout'] = int(td.total_seconds())  # alarm only uses ints
 
     return parsed
 

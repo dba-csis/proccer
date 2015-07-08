@@ -4,7 +4,7 @@ from __future__ import with_statement, division
 
 from calendar import timegm
 from contextlib import contextmanager
-from datetime import datetime, timedelta
+from datetime import datetime
 import jsonlib as json
 import logging
 import os
@@ -19,6 +19,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker, relationship
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.pool import NullPool
 
+from proccer.common import parse_interval
 from proccer.db_types import JSON
 from proccer.notifications import state_change_notification
 
@@ -204,6 +205,7 @@ def update_proccer_job(session, result):
 
     config = result.get('config', {})
     job.warn_after = parse_interval(config.get('warn-after'))
+
     job.notify = config.get('notify')
 
     log.debug('old/new state for job %r: %s/%s',
@@ -241,21 +243,3 @@ def add_proccer_result(session, job, result):
                      result=result['result'],
                      rusage=result['rusage'],
                      output=result['output'])
-
-
-intervals = {
-    'seconds': 1,
-    'minutes': 60,
-    'hours': 60 * 60,
-    'days': 24 * 60 * 60,
-}
-
-
-def parse_interval(s):
-    if s is None:
-        return None
-    try:
-        count, interval = s.split()
-        return timedelta(seconds=int(count) * intervals[interval])
-    except (KeyError, ValueError):
-        raise ValueError('Bad interval', s)
